@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bon de 100 CHF</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #historique {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Utilisation du bon de 100 CHF</h1>
+    <p>Solde restant : <span id="solde">100</span> CHF</p>
+
+    <form id="form">
+        <label for="montant">Montant à déduire :</label>
+        <input type="number" id="montant" required>
+        
+        <label for="stand">Nom du stand :</label>
+        <input type="text" id="stand" required>
+
+        <button type="submit">Utiliser le bon</button>
+    </form>
+
+    <div id="historique">
+        <h2>Historique des utilisations</h2>
+        <ul id="historique-list"></ul>
+    </div>
+
+    <script>
+        // Initialiser le solde si non déjà existant
+        if (!localStorage.getItem('solde_restant')) {
+            localStorage.setItem('solde_restant', 100); // 100 CHF par défaut
+        }
+
+        // Mettre à jour l'affichage du solde
+        function afficherSolde() {
+            const solde = localStorage.getItem('solde_restant');
+            document.getElementById('solde').textContent = solde;
+        }
+
+        // Ajouter une nouvelle utilisation à l'historique
+        function ajouterHistorique(montant, stand) {
+            const historiqueList = document.getElementById('historique-list');
+            const li = document.createElement('li');
+            li.textContent = `Montant : ${montant} CHF, Stand : ${stand}`;
+            historiqueList.appendChild(li);
+        }
+
+        // Gérer la soumission du formulaire
+        document.getElementById('form').addEventListener('submit', function(event) {
+            event.preventDefault(); // Empêcher le rechargement de la page
+
+            const montant = parseFloat(document.getElementById('montant').value);
+            const stand = document.getElementById('stand').value;
+
+            // Obtenir le solde restant
+            let solde_restant = parseFloat(localStorage.getItem('solde_restant'));
+
+            if (montant > solde_restant) {
+                alert('Le montant dépasse le solde restant.');
+                return;
+            }
+
+            // Déduire le montant et mettre à jour le solde
+            solde_restant -= montant;
+            localStorage.setItem('solde_restant', solde_restant);
+
+            // Ajouter l'historique
+            ajouterHistorique(montant, stand);
+
+            // Mettre à jour l'affichage du solde
+            afficherSolde();
+
+            // Effacer les champs du formulaire
+            document.getElementById('form').reset();
+        });
+
+        // Afficher le solde au chargement de la page
+        afficherSolde();
+    </script>
+</body>
+</html>
